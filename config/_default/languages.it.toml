@@ -1,0 +1,23 @@
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "Società Atletica Castello"
+
+[params]
+  displayName = "Italiano"
+  isoCode = "it"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/logo_castello.gif"
+  description = "Description"
+
+[params.author]
+  name = "Baldarn"
+  email = "lorenzo.farnararo@gmail.com"
+  image = "img/logo_castello.gif"
+  headline = "OMG."
+  bio = "BIO"
+  links = [
+    { x-twitter = "https://twitter.com/burufugu" },
+    { github = "https://github.com/nunocoracao/blowfish" },
+  ]
