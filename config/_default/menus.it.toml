@@ -11,63 +11,25 @@
 # ordered by weight from lowest to highest.
 
 [[main]]
-  name = "Documenti"
-  pageRef = "docs"
+  name = "Storia"
+  pageRef = "storia"
+  weight = 1
+
+[[main]]
+  name = "Statuto"
+  pageRef = "statuto"
   weight = 10
 
 [[main]]
-  name = "Shortcodes"
-  pageRef = "docs/shortcodes"
-  weight = 15
-
-[[main]]
-  name = "Esempi"
+  name = "Contatti"
+  pageRef = "contatti"
   weight = 20
-
-[[main]]
-  name = "Campioni"
-  parent = "Esempi"
-  pageRef = "samples"
-  weight = 16
-
-[[main]]
-  name = "Vetrina"
-  parent = "Esempi"
-  pageRef = "examples"
-  weight = 30
-
-[[main]]
-  name = "Ricette"
-  parent = "Esempi"
-  pageRef = "guides"
-  weight = 40
-
-[[main]]
-  name = "Utenti"
-  pageRef = "users"
-  weight = 90
-
-[[main]]
-  name = "Merch"
-  url = "https://www.teepublic.com/user/blowfish-store/t-shirts"
-  weight = 100
-
-#[[main]]
-#  name = "Test"
-#  pageRef = "pagTest"
-#  weight = 1000
 
 [[main]]
   identifier = "facebook"
   pre = "facebook"
   url = "https://www.facebook.com/castello.channel"
   weight = 200
-
-#[[main]]
-#  identifier = "mastodon"
-#  pre = "mastodon"
-#  weight = 300
-#  url = "https://masto.ai/@blowfish"
 
 [[main]]
   identifier = "instagram"
@@ -85,7 +47,7 @@
    pageRef = "tags"
    weight = 10
 
- [[footer]]
-   name = "Autori"
-   pageRef = "authors"
-   weight = 20
+#  [[footer]]
+#    name = "Autori"
+#    pageRef = "authors"
+#    weight = 20
