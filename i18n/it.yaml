@@ -35,7 +35,7 @@ error:
 footer:
   dark_appearance: "Passa all'aspetto scuro"
   light_appearance: "Passa all'aspetto chiaro"
-  powered_by: ""
+  powered_by: "Powered by {{ .Hugo }} &amp; {{ .Theme }}"
 
 list:
   externalurl_title: "Link a sito esterno"
