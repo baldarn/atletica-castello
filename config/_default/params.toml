@@ -32,7 +32,7 @@ smartTOCHideUnfocusedChildren = false
   layout = "fixed" # valid options: basic, fixed, fixed-fill, fixed-gradient, fixed-fill-blur
 
 [footer]
-  showMenu = true
+  showMenu = false
   showCopyright = false
   showThemeAttribution = false
   showAppearanceSwitcher = true
