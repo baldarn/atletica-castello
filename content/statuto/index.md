@@ -1,6 +1,7 @@
 ---
 title: "Statuto"
 description: "Statuto della società cooperativa Atletica Castello"
+showDate: false
 ---
 
 # STATUTO

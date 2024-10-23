@@ -1,6 +1,7 @@
 ---
 title: "Storia"
 description: "Storia della società cooperativa Atletica Castello"
+showDate: false
 ---
 
 La Società sportiva ATLETICA CASTELLO opera dal 1970 sul territorio di Castello con affermata presenza e riconoscibilità dettata dalla consolidata esperienza nel settore socio-ricreativo e arricchita da importanti e significativi risultati sportivi.

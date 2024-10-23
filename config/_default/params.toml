@@ -14,7 +14,7 @@ enableCodeCopy = true
 
 replyByEmail = false
 
-mainSections = ["docs"]
+mainSections = ["news"]
 # robots = ""
 
 disableImageOptimization = false
@@ -41,22 +41,22 @@ smartTOCHideUnfocusedChildren = false
 [homepage]
   layout = "page" # valid options: page, profile, hero, card, background, custom
   # homepageImage = "/img/iceland.jpg" # used in: hero, and card
-  showRecent = false
+  showRecent = true
   showRecentItems = 6
   showMoreLink = true
-  showMoreLinkDest = "docs"
+  showMoreLinkDest = "news"
   cardView = true
   cardViewScreenWidth = false
   layoutBackgroundBlur = true # only used when layout equals background
 
 [article]
-  showDate = false
+  showDate = true
   showViews = false
   showLikes = false
   showDateOnlyInArticle = false
   showDateUpdated = false
   showAuthor = false
-  # showAuthorBottom = false
+  showAuthorBottom = false
   showHero = true
   heroStyle = "background" # valid options: basic, big, background, thumbAndBackground
   layoutBackgroundBlur = true # only used when heroStyle equals background
@@ -77,7 +77,7 @@ smartTOCHideUnfocusedChildren = false
   showAuthorsBadges = false 
   showWordCount = false
   sharingLinks = [ "whatsapp", "facebook", "linkedin", "twitter", "bluesky", "reddit", "telegram", "pinterest", "email"]
-  showZenMode = true
+  showZenMode = false
 
 [list]
   showHero = true

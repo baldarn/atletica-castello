@@ -6,7 +6,7 @@ FTP_REMOTE_DIR ?= $(shell echo $$FTP_REMOTE_DIR)
 deploy:
 	rm -rf public
 	hugo
-
+	
 	lftp -e "\
 	set ftp:ssl-allow no; \
 	open -u $(FTP_USERNAME),$(FTP_PASSWORD) $(FTP_SERVER); \

@@ -13,7 +13,7 @@
 [[main]]
   name = "Storia"
   pageRef = "storia"
-  weight = 1
+  weight = 2
 
 [[main]]
   name = "Statuto"
@@ -24,6 +24,11 @@
   name = "Contatti"
   pageRef = "contatti"
   weight = 20
+
+[[main]]
+  name = "Donazioni"
+  pageRef = "donazioni"
+  weight = 30
 
 [[main]]
   identifier = "facebook"

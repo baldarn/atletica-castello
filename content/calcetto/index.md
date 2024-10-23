@@ -1,6 +1,7 @@
 ---
 title: "Calcetto"
 description: "Calcetto presso società cooperativa Atletica Castello"
+showDate: false
 ---
 
 {{< gallery >}}
