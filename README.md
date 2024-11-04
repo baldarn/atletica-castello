@@ -2,12 +2,19 @@
 
 ## Sviluppo
 
+Consiglio di usare [mise](https://mise.jdx.dev/) configurando come variabili di ambiente i file `.env`
+
+Per installare Hugo, esegui:
+
+```sh
+mise i
+```
+
 Per sviluppo, esegui:
 
 ```sh
 make dev
 ```
-
 
 ## Deploy
 
