@@ -33,13 +33,13 @@
 [[main]]
   identifier = "facebook"
   pre = "facebook"
-  url = "https://www.facebook.com/castello.channel"
+  url = "https://www.facebook.com/profile.php?id=61567972485739"
   weight = 200
 
 [[main]]
   identifier = "instagram"
   pre = "instagram"
-  url = "https://www.instagram.com/castellochannel"
+  url = "https://www.instagram.com/atleticacastellochannel/"
   weight = 400
 
 
