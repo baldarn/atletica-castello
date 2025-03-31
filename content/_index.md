@@ -13,13 +13,12 @@ La Società sportiva ATLETICA CASTELLO opera dal 1970 sul territorio di Castello
 Il giardino è accessibile dalle 17:30 alle 23:00
 
 ![1](/img/giochi/giochi1.jpg)
-
 ![2](/img/giochi/giochi2.jpg)
-
 ![3](/img/giochi/giochi3.jpg)
-
 ![4](/img/giochi/giochi4.jpg)
-
 ![5](/img/giochi/giochi5.jpg)
-
 ![6](/img/giochi/giochi6.jpg)
+
+Installazioni per bambini 0-4 anni
+
+![giochi](/news/giochi_bambini/img/giochi.jpg)
