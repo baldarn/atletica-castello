@@ -47,6 +47,12 @@
   url = "https://www.instagram.com/atleticacastellochannel/"
   weight = 400
 
+[[main]]
+  identifier = "whatsapp"
+  pre = "whatsapp"
+  url = "https://chat.whatsapp.com/D9G1y0P2NroEvCgAcDqFPQ"
+  weight = 400
+
 
 # -- Footer Menu --
 # The footer menu is displayed at the bottom of the page, just before
