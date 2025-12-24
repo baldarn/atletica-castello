@@ -5,7 +5,7 @@ showDate: false
 showTableOfContents: false
 ---
 
-## Per informazioni generali della società Altletica Castello [{{< icon "phone" >}} 345 3975457](tel:3453975457) dopo le 18:30
+## Per informazioni generali della società Altletica Castello [{{< icon "phone" >}} 353 4937251](tel:3534937251) o inviare un [messaggio whatsapp {{< icon "whatsapp" >}}](https://wa.me/3335778330)
 
 ## in caso di mancata risposta sarete sicuramente ricontattati appena possibile
 
