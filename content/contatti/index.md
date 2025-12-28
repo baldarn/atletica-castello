@@ -5,7 +5,7 @@ showDate: false
 showTableOfContents: false
 ---
 
-## Per informazioni generali della società Altletica Castello [{{< icon "phone" >}} 353 4937251](tel:3534937251) o inviare un [messaggio whatsapp {{< icon "whatsapp" >}}](https://wa.me/3335778330)
+## Per informazioni generali della società Atletica Castello [{{< icon "phone" >}} 353 4937251](tel:3534937251) o inviare un [messaggio whatsapp {{< icon "whatsapp" >}}](https://wa.me/3534937251)
 
 ## in caso di mancata risposta sarete sicuramente ricontattati appena possibile
 
