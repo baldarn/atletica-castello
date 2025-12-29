@@ -19,7 +19,7 @@ showTableOfContents: false
 
 # PODISMO
 
-# [{{< icon "instagram" >}}](https://www.instagram.com/atleticacastello/) [{{< icon "facebook" >}}](https://www.facebook.com/ASDAtleticaCastelloFirenze) [{{< icon "whatsapp" >}}](https://wa.me/349 362773)
+# [{{< icon "instagram" >}}](https://www.instagram.com/atleticacastello/) [{{< icon "facebook" >}}](https://www.facebook.com/ASDAtleticaCastelloFirenze) [{{< icon "whatsapp" >}}](https://wa.me/349362773)
 # [{{< icon "phone" >}} 349 3362773](tel:3493362773)
 
 # PODISMO ATLETICA LEGGERA GIOVANILE
