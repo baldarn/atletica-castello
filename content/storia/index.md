@@ -22,3 +22,5 @@ Il VOLLEY con circa 40 atleti e addetti;
 La Ginnastica dolce per Adulti con circa 18 utilizzatori e addetti;
 
 L'atletica leggera Giovanile di recente costituzione
+
+[PER APPROFONDIRE la storia narrata da un fondatore: Massimo Petri](/correva_l'anno_massimo_petri.pdf)
