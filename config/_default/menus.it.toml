@@ -1,7 +1,7 @@
 # -- Main Menu --
 # The main menu is displayed in the header at the top of the page.
 # Acceptable parameters are name, pageRef, page, url, title, weight.
-# 
+#
 # The simplest menu configuration is to provide:
 #   name = The name to be displayed for this menu link
 #   pageRef = The identifier of the page or section to link to
@@ -31,15 +31,15 @@
   weight = 20
 
 [[main]]
-  name = "Donazioni"
-  pageRef = "donazioni"
+  name = "Come sostenerci"
+  pageRef = "come sostenerci"
   weight = 30
 
 [[main]]
   identifier = "facebook"
   pre = "facebook"
   url = "https://www.facebook.com/profile.php?id=61567972485739"
-  weight = 200
+  weight = 400
 
 [[main]]
   identifier = "instagram"

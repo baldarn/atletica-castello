@@ -4,23 +4,25 @@ description: "Storia della società cooperativa Atletica Castello"
 showDate: false
 ---
 
-La Società sportiva ATLETICA CASTELLO opera dal 1970 sul territorio di Castello con affermata presenza e riconoscibilità dettata dalla consolidata esperienza nel settore socio-ricreativo e arricchita da importanti e significativi risultati sportivi.
+Tutto nasce dall’entusiasmo di due giovani amici, Massimo e Alessandro, adolescenti appassionati di calcio e atletica leggera che si allenavano a Castelquarto, presso la Società Sportiva con sede al Circolo Ricreativo di Quarto.
 
-Le possibilità di gestire impianti sportivi nuovi e pregevoli ubicati in gradevole posizione, e contemporaneamente rendere utilizzabile una sede con annesso parco oggetto d'invidia, fa si che l' ATLETICA CASTELLO sia punto di riferimento per centinaia di utenti.
+Il 31 dicembre 1969 organizzano una corsa di 25 km nel quartiere di Castello, con partenza e arrivo davanti alla Chiesa di San Michele. È il primo passo di quella che, di lì a poco, diventerà Atletica Castello.
 
-Alle innumerevoli iniziative socio-ricreativo-culturali che si cuccedono presso la sede, fa riscontro un'attività sportiva portata avanti nei vari Settori:
-Il CALCIO con 300 tesserati ed oltre 50 addetti;
+Nel 1970, insieme a un gruppo di amici, fondano il Gruppo Sportivo Castello, con l’obiettivo di promuovere attività sportiva e ricreativa sul territorio, con particolare attenzione al podismo.
 
-La RITMICA con 150 tesserati e oltre 15 addetti;
+Nello stesso periodo, la scomparsa di Ugo Chiavacci, amico sincero e punto di riferimento per tanti giovani castellani avvicinati da lui alla montagna e allo sport, lascia un segno profondo. Nasce così l’idea di dedicargli una gara annuale: dal 1971 prende vita il Trofeo Memorial Ugo Chiavacci, corsa in montagna a staffetta, organizzata ogni anno nella prima settimana di ottobre.
 
-Il PODISMO con più di 30 tesserati tra cui atleti di caratura internazionale;
+Nel 1974 prende forma un’altra intuizione destinata a diventare storica: una corsa attraverso i parchi delle Ville Medicee di Castello. Nasce così il
+“Circuito Podistico Tre Ville – attraverso i Magnifici Parchi delle Ville Medicee di Castello”, ufficialmente inserito in calendario dalla prima domenica di maggio del 1975. Un tracciato suggestivo e unico, capace di valorizzare lo straordinario patrimonio paesaggistico del territorio.
 
-Il BASKET con oltre 50 tesserati;
+## LA SEDE
 
-Il VOLLEY con circa 40 atleti e addetti;
+I primi anni sono segnati anche dalla ricerca di una sede stabile.
 
-La Ginnastica dolce per Adulti con circa 18 utilizzatori e addetti;
+Inizialmente il Consiglio Parrocchiale concede in uso alcuni ambienti ricreativi adiacenti alla Chiesa di San Michele, sotto la canonica. Successivamente il gruppo si trasferisce in una piccola stanza in via della Querciola, che per alcuni anni diventa il punto di riferimento logistico.
 
-L'atletica leggera Giovanile di recente costituzione
+Alla scadenza dell’accordo, l’associazione vive un periodo “itinerante”: riunioni organizzate nelle case dei soci e in spazi concessi temporaneamente, tra cui un fondo in via R. Giuliani e una stanza messa a disposizione da un bar della zona.
 
-[PER APPROFONDIRE la storia narrata da un fondatore: Massimo Petri](/correva_l'anno_massimo_petri.pdf)
+Infine arriva l’approdo agli Ex Lavatoi Comunali, in fondo al Viottolone della Villa Reale di Castello, oggi ingresso dell’attuale Giardino “Biancoverde”: una sede che rappresenta stabilità, identità e radicamento nel territorio.
+
+[PER APPROFONDIRE la storia narrata da un fondatore: Massimo Petri](correva_l'anno_massimo_petri.pdf)

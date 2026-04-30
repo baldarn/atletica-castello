@@ -4,9 +4,11 @@ description: "Statuto della società cooperativa Atletica Castello"
 showDate: false
 ---
 
-# STATUTO
+# Statuto Cooperativa Atletica Castello
 
-"ASSOCIAZIONE SPORTIVA DILETTANTISTICA ATLETICA CASTELLO"
+[Statuto Cooperativa Atletica Castello](statuto_cooperativa.pdf)
+
+# Statuto Atletica Castello ASD
 
 ## TITOLO I DENOMINAZIONE SEDE
 
