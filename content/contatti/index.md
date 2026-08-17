@@ -9,7 +9,7 @@ showTableOfContents: false
 
 ## in caso di mancata risposta sarete sicuramente ricontattati appena possibile
 
-## Email [sito@societaatleticacastello.it](mailto:sito@societaatleticacastello.it)
+## Email [info@atleticacastello.it](mailto:info@atleticacastello.it)
 
 # CALCETTO
 
