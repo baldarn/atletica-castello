@@ -15,7 +15,7 @@ showTableOfContents: false
 
 # [{{< icon "phone" >}} 338 6613757](tel:3386613757) lunedì – martedì – mercoledì – giovedì ore 19,30 – 23,30
 
-# [{{< icon "phone" >}} 353 4937251](tel:3534937251) venerdì – sabato – domenica e lunedì – martedì – mercoledì – giovedì fino alle ore 18,30
+# [{{< icon "phone" >}} 353 4937251](tel:3534937251) venerdì – sabato – domenica tutto il giorno e lunedì – martedì – mercoledì – giovedì fino alle ore 18,30
 
 ## [Immagini](/calcetto)
 

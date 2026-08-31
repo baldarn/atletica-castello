@@ -6,7 +6,11 @@ showDate: false
 
 # CALCETTO 
 
-# Per Informazioni telefonare a Raul Cosi al [{{< icon "phone" >}} 3386613757](tel:3386613757)
+# Per Informazioni e prenotazioni telefonare a:
+
+# [{{< icon "phone" >}} 338 6613757](tel:3386613757) lunedì – martedì – mercoledì – giovedì ore 19,30 – 23,30
+
+# [{{< icon "phone" >}} 353 4937251](tel:3534937251) venerdì – sabato – domenica tutto il giorno e lunedì – martedì – mercoledì – giovedì fino alle ore 18,30
 
 ![asd](/img/Porzione-Giardino.gif)
 ![asd](/img/i-campi.gif)
