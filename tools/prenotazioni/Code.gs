@@ -27,7 +27,9 @@ var CONFIG = {
   RISPONDI_A: 'sito@societaatleticacastello.it',
   TELEFONO_INFO: '353 4937251',
   // email che riceve una copia di ogni prenotazione (vuoto = nessuna notifica)
-  NOTIFICA_A: ''
+  NOTIFICA_A: '',
+  // fuso orario usato per non accettare turni già iniziati
+  FUSO_ORARIO: 'Europe/Rome'
 };
 
 var INTESTAZIONI = ['Data e ora prenotazione', 'Giorno', 'Orario', 'Nome', 'Cognome',
@@ -65,7 +67,14 @@ function doPost(e) {
     return json_({ ok: false, errore: 'Troppe richieste in questo momento, riprova tra qualche secondo.' });
   }
   try {
-    var presi = occupati_(d.data);
+    var righe = righe_();
+    // una sola prenotazione per email e per numero di telefono
+    var email = normEmail_(d.email), tel = normTel_(d.telefono);
+    var giaPrenotato = righe.some(function (r) { return normEmail_(r[4]) === email || normTel_(r[5]) === tel; });
+    if (giaPrenotato) {
+      return json_({ ok: false, errore: 'Risulta già una prenotazione con questa email o questo numero di telefono.' });
+    }
+    var presi = occupatiDa_(righe, d.data);
     if (presi.indexOf(d.orario) >= 0) {
       return json_({ ok: false, errore: 'Ci dispiace, l\'orario delle ' + d.orario + ' è appena stato prenotato. Scegline un altro.', occupati: presi });
     }
@@ -96,6 +105,7 @@ function orariPrevisti_() {
 function valida_(d) {
   if (CONFIG.GIORNI.indexOf(d.data) < 0) return 'Il giorno scelto non è prenotabile.';
   if (orariPrevisti_().indexOf(d.orario) < 0) return 'L\'orario scelto non è previsto.';
+  if (d.data + ' ' + d.orario <= adesso_()) return 'Questo orario è già passato: scegline uno successivo.';
   if (!str_(d.nome) || !str_(d.cognome)) return 'Inserisci nome e cognome.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str_(d.email))) return 'Inserisci un indirizzo email valido.';
   if (!/^[+\d][\d\s./-]{5,}$/.test(str_(d.telefono))) return 'Inserisci un numero di telefono valido.';
@@ -105,13 +115,34 @@ function valida_(d) {
   return null;
 }
 
-function occupati_(giorno) {
+// righe del foglio, colonne B..G: [Giorno, Orario, Nome, Cognome, Email, Telefono]
+function righe_() {
   var sh = foglio_();
   var n = sh.getLastRow() - 1;
   if (n < 1) return [];
-  return sh.getRange(2, 2, n, 2).getDisplayValues()
-    .filter(function (r) { return r[0] === giorno; })
-    .map(function (r) { return r[1]; });
+  return sh.getRange(2, 2, n, 6).getDisplayValues();
+}
+
+function occupatiDa_(righe, giorno) {
+  return righe.filter(function (r) { return r[0] === giorno; }).map(function (r) { return r[1]; });
+}
+
+function occupati_(giorno) {
+  return occupatiDa_(righe_(), giorno);
+}
+
+// "AAAA-MM-GG HH:MM" nel fuso orario italiano, confrontabile come testo
+function adesso_() {
+  return Utilities.formatDate(new Date(), CONFIG.FUSO_ORARIO, 'yyyy-MM-dd HH:mm');
+}
+
+function normEmail_(v) { return str_(v).replace(/^'/, '').replace(/\s+/g, '').toLowerCase(); }
+
+// solo cifre, senza prefisso internazionale italiano: "+39 333 123 4567" = "3331234567"
+function normTel_(v) {
+  var t = str_(v).replace(/\D/g, '');
+  if (/^(0039|39)\d{9,10}$/.test(t)) t = t.replace(/^(0039|39)/, '');
+  return t;
 }
 
 function inviaConferma_(d) {

@@ -98,7 +98,7 @@
   <div class="prn-card prn-step-orari" hidden>
     <h3>2. Scegli l'orario</h3>
     <div class="prn-orari"></div>
-    <p class="prn-hint">Ogni turno dura {{ $durata }} minuti. Gli orari barrati sono già prenotati.</p>
+    <p class="prn-hint">Ogni turno dura {{ $durata }} minuti. Gli orari barrati sono già prenotati o già passati. È possibile una sola prenotazione per persona.</p>
   </div>
 
   <div class="prn-card prn-step-form" hidden>
@@ -139,6 +139,7 @@
   function toMin(hhmm) { var p = hhmm.split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
   function toHHMM(m) { return pad(Math.floor(m / 60)) + ":" + pad(m % 60); }
   function parseISO(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function adesso() { var d = new Date(); return iso(d) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()); }
   function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function dataLunga(s) { var d = parseISO(s); return GLUNGHI[d.getDay()] + " " + d.getDate() + " " + MESI[d.getMonth()] + " " + d.getFullYear(); }
   function slotsFascia(f) {
@@ -186,8 +187,9 @@
       html += '<div class="prn-fascia">' + (toMin(f.da) < 13 * 60 ? "Mattina" : "Pomeriggio") + " · " + f.da + "–" + f.a + '</div><div class="prn-slots">';
       slotsFascia(f).forEach(function (o) {
         var preso = occupati.indexOf(o) >= 0;
+        var passato = selGiorno + " " + o <= adesso();
         html += '<button type="button" class="prn-slot' + (o === selOra ? " prn-sel" : "") + '" data-ora="' + o + '"' +
-          (preso ? ' disabled title="Già prenotato"' : "") + ">" + o + "</button>";
+          (preso ? ' disabled title="Già prenotato"' : passato ? ' disabled title="Orario passato"' : "") + ">" + o + "</button>";
       });
       html += "</div>";
     });

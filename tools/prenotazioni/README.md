@@ -41,10 +41,15 @@ Per verificare: aprendo `URL/exec?action=occupati&data=2026-12-19` nel browser d
 - **Doppie prenotazioni**: ogni turno può essere prenotato una sola volta. Il controllo avviene
   con un lock, quindi anche due invii contemporanei non possono prendere lo stesso orario;
   chi arriva secondo vede un messaggio e la lista aggiornata degli orari liberi.
+- **Una prenotazione a persona**: dentro lo stesso lock il backend rifiuta la richiesta se l'email
+  (senza maiuscole/spazi) o il telefono (solo cifre, senza +39) hanno già una prenotazione.
+  Così una sola persona non può occupare tutti i turni.
+- **Orari passati**: non si possono prenotare giorni od orari già iniziati (fuso orario `Europe/Rome`);
+  la pagina li mostra barrati e il backend li rifiuta comunque.
 - **Email di conferma**: inviata automaticamente all'indirizzo indicato, con "rispondi a"
   `sito@societaatleticacastello.it`. Un account Gmail gratuito può inviare circa 100 email al giorno.
 - **Anti-spam**: il modulo ha un campo nascosto "trappola" che i bot compilano e le persone no.
-- **Annullare una prenotazione**: basta cancellare la riga dal foglio; l'orario torna libero subito.
+- **Annullare una prenotazione**: basta cancellare la riga dal foglio; l'orario torna libero subito e la persona può prenotare di nuovo.
 
 ## Modifiche successive al codice
 
