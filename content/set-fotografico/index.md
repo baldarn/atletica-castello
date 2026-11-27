@@ -33,11 +33,7 @@ Per informazioni chiamaci al [{{< icon "phone" >}} 353 4937251](tel:3534937251) 
 
 Società Atletica Castello – Oasi Biancoverde, Via Reginaldo Giuliani 518, Firenze
 
-<div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:.75rem;overflow:hidden;margin:1rem 0 2rem;">
-  <iframe title="Mappa: Società Atletica Castello, Via Reginaldo Giuliani 518, Firenze"
-    src="https://maps.google.com/maps?q=Via%20Reginaldo%20Giuliani%20518%2C%2050141%20Firenze&z=16&output=embed"
-    style="position:absolute;inset:0;width:100%;height:100%;border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-</div>
+{{< mappa indirizzo="Via Reginaldo Giuliani 518, 50141 Firenze" titolo="Società Atletica Castello – Oasi Biancoverde" >}}
 
 [Apri in Google Maps](https://www.google.com/maps/search/?api=1&query=Via+Reginaldo+Giuliani+518+Firenze)
 
