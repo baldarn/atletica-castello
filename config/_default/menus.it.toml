@@ -16,9 +16,14 @@
 #   weight = 1
 
 [[main]]
+  name = "Set fotografico 🎄"
+  pageRef = "set-fotografico"
+  weight = 2
+
+[[main]]
   name = "Storia"
   pageRef = "storia"
-  weight = 2
+  weight = 3
 
 [[main]]
   name = "Statuto"

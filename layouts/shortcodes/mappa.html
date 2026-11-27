@@ -1,0 +1,63 @@
+{{/*
+  Shortcode "mappa": mappa di Google Maps caricata solo dopo il clic del visitatore,
+  così non vengono impostati cookie di terze parti senza consenso.
+
+  Parametri:
+    indirizzo = indirizzo da cercare (obbligatorio)
+    titolo    = testo mostrato nell'anteprima (default: l'indirizzo)
+
+  Esempio:
+    {{< mappa indirizzo="Via Reginaldo Giuliani 518, 50141 Firenze" titolo="Società Atletica Castello" >}}
+*/}}
+{{- $indirizzo := .Get "indirizzo" -}}
+{{- if not $indirizzo }}{{ errorf "Shortcode \"mappa\" in %s: manca il parametro indirizzo" .Page.Path }}{{ end -}}
+{{- $titolo := .Get "titolo" | default $indirizzo -}}
+{{- $src := printf "https://maps.google.com/maps?q=%s&z=16&output=embed" (querify "q" $indirizzo | strings.TrimPrefix "q=") -}}
+<style>
+  .mappa { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: .75rem; overflow: hidden; margin: 1rem 0 1rem;
+    border: 1px solid rgba(var(--color-neutral-300), 1);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 38px, rgba(var(--color-primary-200), .6) 38px 40px),
+      repeating-linear-gradient(90deg, transparent 0 58px, rgba(var(--color-primary-200), .6) 58px 60px),
+      rgba(var(--color-primary-50), 1); }
+  .dark .mappa { border-color: rgba(var(--color-neutral-600), 1);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 38px, rgba(var(--color-primary-800), .5) 38px 40px),
+      repeating-linear-gradient(90deg, transparent 0 58px, rgba(var(--color-primary-800), .5) 58px 60px),
+      rgba(var(--color-neutral-800), 1); }
+  .mappa-anteprima { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .6rem; text-align: center; padding: 1rem; }
+  .mappa-pin { font-size: 2.5rem; line-height: 1; }
+  .mappa-titolo { font-weight: 700; font-size: 1.1rem; }
+  .mappa-nota { font-size: .85rem; opacity: .75; max-width: 34rem; margin: 0; }
+  .mappa-btn { padding: .6rem 1.2rem; border-radius: .5rem; border: 0; font-weight: 700; cursor: pointer; font-size: 1rem;
+    background: rgba(var(--color-primary-600), 1); color: #fff; }
+  .mappa-btn:hover { background: rgba(var(--color-primary-700), 1); }
+  .dark .mappa-btn { background: rgba(var(--color-primary-500), 1); color: #000; }
+  .mappa iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  @media (max-width: 640px) { .mappa { aspect-ratio: 4 / 3; } }
+</style>
+<div class="mappa not-prose" data-src="{{ $src }}" data-titolo="Mappa: {{ $titolo }}">
+  <div class="mappa-anteprima">
+    <div class="mappa-pin" aria-hidden="true">📍</div>
+    <div class="mappa-titolo">{{ $titolo }}</div>
+    <button type="button" class="mappa-btn">Mostra la mappa</button>
+    <p class="mappa-nota">La mappa è fornita da Google Maps: caricandola, Google può impostare cookie sul tuo dispositivo.</p>
+  </div>
+</div>
+<script>
+(function () {
+  document.querySelectorAll(".mappa:not([data-pronta])").forEach(function (box) {
+    box.setAttribute("data-pronta", "");
+    box.querySelector(".mappa-btn").addEventListener("click", function () {
+      var f = document.createElement("iframe");
+      f.src = box.dataset.src;
+      f.title = box.dataset.titolo;
+      f.loading = "lazy";
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      f.allowFullscreen = true;
+      box.replaceChildren(f);
+    });
+  });
+})();
+</script>
