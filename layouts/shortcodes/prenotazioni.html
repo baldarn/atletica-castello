@@ -1,0 +1,266 @@
+{{/*
+  Shortcode "prenotazioni": calendario + orari cliccabili + modulo di prenotazione.
+
+  Parametri (tutti opzionali):
+    giorni  = giorni prenotabili, formato AAAA-MM-GG separati da virgola (default "2026-12-19")
+    fasce   = fasce orarie HH:MM-HH:MM separate da virgola (default "10:00-13:00,14:00-17:00")
+    durata  = durata di un turno in minuti (default 20)
+    privacy = link all'informativa privacy (default "/informativa_privacy.pdf")
+
+  L'indirizzo del backend (Google Apps Script) si imposta nel front matter della pagina:
+    scriptUrl: "https://script.google.com/macros/s/.../exec"
+  Se scriptUrl è vuoto la pagina mostra "Le prenotazioni apriranno a breve".
+
+  Esempio:
+    {{< prenotazioni giorni="2026-12-19" fasce="10:00-13:00,14:00-17:00" durata="20" >}}
+*/}}
+{{- $giorni := .Get "giorni" | default "2026-12-19" -}}
+{{- $fasce := .Get "fasce" | default "10:00-13:00,14:00-17:00" -}}
+{{- $durata := .Get "durata" | default "20" -}}
+{{- $privacy := .Get "privacy" | default "/informativa_privacy.pdf" -}}
+{{- $scriptUrl := .Page.Params.scriptUrl | default "" -}}
+{{- $id := printf "prenotazioni-%d" .Ordinal -}}
+
+<style>
+  .prn { --prn-p: var(--color-primary-600); --prn-n: var(--color-neutral-800); margin: 2rem 0; }
+  .prn * { box-sizing: border-box; }
+  .prn-card { border: 1px solid rgba(var(--color-neutral-300), 1); border-radius: .75rem; padding: 1.25rem; margin-bottom: 1.5rem; background: rgba(var(--color-neutral), 1); }
+  .prn h3 { margin: 0 0 .75rem !important; font-size: 1.15rem; font-weight: 700; }
+  .prn-chiuso { text-align: center; font-size: 1.25rem; font-weight: 600; padding: 2rem 1rem; }
+  .prn-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+  .prn-cal-head strong { font-size: 1.1rem; text-transform: capitalize; }
+  .prn-nav { border: 1px solid rgba(var(--color-neutral-300), 1); background: transparent; color: inherit; border-radius: .5rem; padding: .25rem .75rem; cursor: pointer; font-size: 1rem; }
+  .prn-nav:disabled { opacity: .3; cursor: default; }
+  .prn-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem; text-align: center; }
+  .prn-dow { font-size: .8rem; font-weight: 600; opacity: .7; padding: .25rem 0; }
+  .prn-day { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border-radius: .5rem; font-size: .95rem; border: 1px solid transparent; background: transparent; color: inherit; opacity: .35; padding: 0; }
+  .prn-day.prn-ok { opacity: 1; cursor: pointer; font-weight: 700; border-color: rgba(var(--color-primary-500), 1); color: rgba(var(--color-primary-700), 1); background: rgba(var(--color-primary-100), 1); }
+  .prn-day.prn-ok:hover { background: rgba(var(--color-primary-200), 1); }
+  .prn-day.prn-sel, .prn-day.prn-sel:hover { background: rgba(var(--color-primary-600), 1); color: #fff; }
+  .prn-fascia { margin: .75rem 0 .5rem; font-weight: 600; }
+  .prn-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); gap: .5rem; }
+  .prn-slot { padding: .55rem .25rem; border-radius: .5rem; border: 1px solid rgba(var(--color-primary-500), 1); background: transparent; color: rgba(var(--color-primary-700), 1); font-weight: 600; cursor: pointer; font-size: .95rem; }
+  .prn-slot:hover { background: rgba(var(--color-primary-100), 1); }
+  .prn-slot.prn-sel, .prn-slot.prn-sel:hover { background: rgba(var(--color-primary-600), 1); color: #fff; }
+  .prn-slot:disabled { cursor: not-allowed; opacity: .45; text-decoration: line-through; border-color: rgba(var(--color-neutral-400), 1); color: inherit; background: transparent; }
+  .prn-hint { font-size: .9rem; opacity: .75; margin: .5rem 0 0; }
+  .prn-form { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem 1rem; }
+  .prn-form .prn-full { grid-column: 1 / -1; }
+  .prn-form label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .25rem; }
+  .prn-form input[type=text], .prn-form input[type=email], .prn-form input[type=tel], .prn-form textarea {
+    width: 100%; padding: .6rem .75rem; border-radius: .5rem; font-size: 1rem; color: inherit;
+    border: 1px solid rgba(var(--color-neutral-400), 1); background: rgba(var(--color-neutral), 1); }
+  .prn-form input:focus, .prn-form textarea:focus { outline: 2px solid rgba(var(--color-primary-500), 1); outline-offset: 1px; }
+  .prn-check { display: flex; gap: .5rem; align-items: flex-start; font-weight: 400 !important; }
+  .prn-check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; accent-color: rgba(var(--color-primary-600), 1); }
+  .prn-riepilogo { padding: .6rem .8rem; border-radius: .5rem; background: rgba(var(--color-primary-100), 1); color: rgba(var(--color-primary-900), 1); font-weight: 600; }
+  .prn-submit { padding: .75rem 1.5rem; border-radius: .5rem; border: 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; background: rgba(var(--color-primary-600), 1); color: #fff; }
+  .prn-submit:hover { background: rgba(var(--color-primary-700), 1); }
+  .prn-submit:disabled { opacity: .5; cursor: default; }
+  .prn-msg { padding: .8rem 1rem; border-radius: .5rem; font-weight: 600; }
+  .prn-msg.prn-err { background: #fde8e8; color: #9b1c1c; }
+  .prn-msg.prn-okmsg { background: rgba(var(--color-primary-100), 1); color: rgba(var(--color-primary-900), 1); }
+  .prn-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+  @media (max-width: 640px) { .prn-form { grid-template-columns: 1fr; } .prn-card { padding: 1rem; } }
+
+  /* Tema scuro (Blowfish mette la classe "dark" su <html>) */
+  .dark .prn-card { background: rgba(var(--color-neutral-800), 1); border-color: rgba(var(--color-neutral-600), 1); }
+  .dark .prn-nav { border-color: rgba(var(--color-neutral-600), 1); }
+  .dark .prn-day.prn-ok { background: rgba(var(--color-primary-900), 1); color: rgba(var(--color-primary-300), 1); border-color: rgba(var(--color-primary-400), 1); }
+  .dark .prn-day.prn-ok:hover, .dark .prn-slot:hover { background: rgba(var(--color-primary-800), 1); }
+  .dark .prn-slot { color: rgba(var(--color-primary-300), 1); border-color: rgba(var(--color-primary-400), 1); }
+  .dark .prn-day.prn-sel, .dark .prn-slot.prn-sel { background: rgba(var(--color-primary-500), 1); color: #000; }
+  .dark .prn-slot:disabled { color: inherit; border-color: rgba(var(--color-neutral-600), 1); background: transparent; }
+  .dark .prn-form input[type=text], .dark .prn-form input[type=email], .dark .prn-form input[type=tel], .dark .prn-form textarea {
+    background: rgba(var(--color-neutral-900), 1); border-color: rgba(var(--color-neutral-600), 1); }
+  .dark .prn-riepilogo, .dark .prn-msg.prn-okmsg { background: rgba(var(--color-primary-900), 1); color: rgba(var(--color-primary-200), 1); }
+  .dark .prn-submit { background: rgba(var(--color-primary-500), 1); color: #000; }
+  .dark .prn-submit:hover { background: rgba(var(--color-primary-400), 1); }
+  .dark .prn-msg.prn-err { background: #4b1d1d; color: #fecaca; }
+</style>
+
+<div class="prn not-prose" id="{{ $id }}"
+     data-giorni="{{ $giorni }}" data-fasce="{{ $fasce }}" data-durata="{{ $durata }}"
+     data-script="{{ $scriptUrl }}">
+{{- if eq $scriptUrl "" }}
+  <div class="prn-card prn-chiuso">⏳ Le prenotazioni apriranno a breve</div>
+{{- else }}
+  <div class="prn-card">
+    <h3>1. Scegli il giorno</h3>
+    <div class="prn-cal-head">
+      <button type="button" class="prn-nav" data-nav="-1" aria-label="Mese precedente">‹</button>
+      <strong class="prn-mese"></strong>
+      <button type="button" class="prn-nav" data-nav="1" aria-label="Mese successivo">›</button>
+    </div>
+    <div class="prn-cal" role="grid"></div>
+  </div>
+
+  <div class="prn-card prn-step-orari" hidden>
+    <h3>2. Scegli l'orario</h3>
+    <div class="prn-orari"></div>
+    <p class="prn-hint">Ogni turno dura {{ $durata }} minuti. Gli orari barrati sono già prenotati.</p>
+  </div>
+
+  <div class="prn-card prn-step-form" hidden>
+    <h3>3. I tuoi dati</h3>
+    <form class="prn-form" novalidate>
+      <div class="prn-full prn-riepilogo"></div>
+      <div><label for="{{ $id }}-nome">Nome *</label><input type="text" id="{{ $id }}-nome" name="nome" required autocomplete="given-name" maxlength="60"></div>
+      <div><label for="{{ $id }}-cognome">Cognome *</label><input type="text" id="{{ $id }}-cognome" name="cognome" required autocomplete="family-name" maxlength="60"></div>
+      <div><label for="{{ $id }}-email">Email *</label><input type="email" id="{{ $id }}-email" name="email" required autocomplete="email" maxlength="120"></div>
+      <div><label for="{{ $id }}-telefono">Telefono *</label><input type="tel" id="{{ $id }}-telefono" name="telefono" required autocomplete="tel" maxlength="30"></div>
+      <div class="prn-full"><label for="{{ $id }}-note">Note</label><textarea id="{{ $id }}-note" name="note" rows="3" maxlength="500" placeholder="Es. numero di bambini, richieste particolari…"></textarea></div>
+      <div class="prn-hp" aria-hidden="true"><label>Lascia vuoto<input type="text" name="sito" tabindex="-1" autocomplete="off"></label></div>
+      <div class="prn-full"><label class="prn-check"><input type="checkbox" name="privacy" required>
+        <span>Ho letto l'<a href="{{ $privacy }}" target="_blank" rel="noopener">informativa sulla privacy</a> e acconsento al trattamento dei miei dati per la gestione della prenotazione. *</span></label></div>
+      <div class="prn-full prn-msg" hidden role="status" aria-live="polite"></div>
+      <div class="prn-full"><button type="submit" class="prn-submit">Prenota</button></div>
+    </form>
+  </div>
+{{- end }}
+</div>
+
+{{- if ne $scriptUrl "" }}
+<script>
+(function () {
+  var root = document.getElementById({{ $id }});
+  if (!root) return;
+  var SCRIPT = root.dataset.script;
+  var GIORNI = root.dataset.giorni.split(",").map(function (s) { return s.trim(); }).filter(Boolean).sort();
+  var DURATA = parseInt(root.dataset.durata, 10) || 20;
+  var FASCE = root.dataset.fasce.split(",").map(function (f) {
+    var p = f.trim().split("-"); return { da: p[0].trim(), a: p[1].trim() };
+  });
+  var MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+  var GSET = ["lun","mar","mer","gio","ven","sab","dom"];
+  var GLUNGHI = ["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function toMin(hhmm) { var p = hhmm.split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+  function toHHMM(m) { return pad(Math.floor(m / 60)) + ":" + pad(m % 60); }
+  function parseISO(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function dataLunga(s) { var d = parseISO(s); return GLUNGHI[d.getDay()] + " " + d.getDate() + " " + MESI[d.getMonth()] + " " + d.getFullYear(); }
+  function slotsFascia(f) {
+    var out = [];
+    for (var m = toMin(f.da); m + DURATA <= toMin(f.a); m += DURATA) out.push(toHHMM(m));
+    return out;
+  }
+
+  var $ = function (sel) { return root.querySelector(sel); };
+  var cal = $(".prn-cal"), meseEl = $(".prn-mese"), orari = $(".prn-orari");
+  var stepOrari = $(".prn-step-orari"), stepForm = $(".prn-step-form");
+  var form = $(".prn-form"), msg = $(".prn-msg"), btn = $(".prn-submit"), riep = $(".prn-riepilogo");
+
+  var primo = parseISO(GIORNI[0]), ultimo = parseISO(GIORNI[GIORNI.length - 1]);
+  var vista = new Date(primo.getFullYear(), primo.getMonth(), 1);
+  var selGiorno = null, selOra = null, occupati = [];
+
+  function mostraMsg(testo, ok) {
+    msg.hidden = false; msg.textContent = testo;
+    msg.className = "prn-full prn-msg " + (ok ? "prn-okmsg" : "prn-err");
+  }
+
+  function disegnaCalendario() {
+    meseEl.textContent = MESI[vista.getMonth()] + " " + vista.getFullYear();
+    root.querySelector('[data-nav="-1"]').disabled = vista <= new Date(primo.getFullYear(), primo.getMonth(), 1);
+    root.querySelector('[data-nav="1"]').disabled = vista >= new Date(ultimo.getFullYear(), ultimo.getMonth(), 1);
+    var html = GSET.map(function (g) { return '<div class="prn-dow">' + g + "</div>"; }).join("");
+    var offset = (vista.getDay() + 6) % 7; // lunedì = 0
+    for (var i = 0; i < offset; i++) html += "<div></div>";
+    var giorniMese = new Date(vista.getFullYear(), vista.getMonth() + 1, 0).getDate();
+    var oggi = iso(new Date());
+    for (var d = 1; d <= giorniMese; d++) {
+      var s = iso(new Date(vista.getFullYear(), vista.getMonth(), d));
+      var ok = GIORNI.indexOf(s) >= 0 && s >= oggi;
+      html += ok
+        ? '<button type="button" class="prn-day prn-ok' + (s === selGiorno ? " prn-sel" : "") + '" data-giorno="' + s + '" aria-label="' + dataLunga(s) + '">' + d + "</button>"
+        : '<div class="prn-day" aria-hidden="true">' + d + "</div>";
+    }
+    cal.innerHTML = html;
+  }
+
+  function disegnaOrari() {
+    var html = "";
+    FASCE.forEach(function (f) {
+      html += '<div class="prn-fascia">' + (toMin(f.da) < 13 * 60 ? "Mattina" : "Pomeriggio") + " · " + f.da + "–" + f.a + '</div><div class="prn-slots">';
+      slotsFascia(f).forEach(function (o) {
+        var preso = occupati.indexOf(o) >= 0;
+        html += '<button type="button" class="prn-slot' + (o === selOra ? " prn-sel" : "") + '" data-ora="' + o + '"' +
+          (preso ? ' disabled title="Già prenotato"' : "") + ">" + o + "</button>";
+      });
+      html += "</div>";
+    });
+    orari.innerHTML = html;
+  }
+
+  function caricaOccupati() {
+    orari.innerHTML = '<p class="prn-hint">Caricamento orari disponibili…</p>';
+    return fetch(SCRIPT + "?action=occupati&data=" + encodeURIComponent(selGiorno))
+      .then(function (r) { return r.json(); })
+      .then(function (j) { occupati = (j && j.occupati) || []; })
+      .catch(function () { occupati = []; })
+      .then(disegnaOrari);
+  }
+
+  function scegliGiorno(g, scorri) {
+    selGiorno = g; selOra = null; stepForm.hidden = true;
+    disegnaCalendario(); stepOrari.hidden = false; caricaOccupati();
+    if (scorri) stepOrari.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  root.addEventListener("click", function (e) {
+    var t = e.target.closest("button");
+    if (!t || !root.contains(t)) return;
+    if (t.dataset.nav) {
+      vista = new Date(vista.getFullYear(), vista.getMonth() + parseInt(t.dataset.nav, 10), 1);
+      disegnaCalendario();
+    } else if (t.dataset.giorno) {
+      scegliGiorno(t.dataset.giorno, true);
+    } else if (t.dataset.ora) {
+      selOra = t.dataset.ora; disegnaOrari();
+      riep.textContent = "📅 " + dataLunga(selGiorno) + " alle ore " + selOra;
+      stepForm.hidden = false; msg.hidden = true;
+      stepForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var fd = new FormData(form);
+    var dati = {
+      action: "prenota", data: selGiorno, orario: selOra,
+      nome: (fd.get("nome") || "").trim(), cognome: (fd.get("cognome") || "").trim(),
+      email: (fd.get("email") || "").trim(), telefono: (fd.get("telefono") || "").trim(),
+      note: (fd.get("note") || "").trim(), privacy: !!fd.get("privacy"), sito: fd.get("sito") || ""
+    };
+    if (!selGiorno || !selOra) return mostraMsg("Scegli un giorno e un orario.");
+    if (!dati.nome || !dati.cognome || !dati.email || !dati.telefono) return mostraMsg("Compila tutti i campi obbligatori (*).");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dati.email)) return mostraMsg("Inserisci un indirizzo email valido.");
+    if (!/^[+\d][\d\s./-]{5,}$/.test(dati.telefono)) return mostraMsg("Inserisci un numero di telefono valido.");
+    if (!dati.privacy) return mostraMsg("Per prenotare è necessario accettare l'informativa sulla privacy.");
+
+    btn.disabled = true; btn.textContent = "Invio in corso…"; msg.hidden = true;
+    // text/plain evita la richiesta preflight CORS verso Google Apps Script
+    fetch(SCRIPT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dati) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) {
+          mostraMsg("✅ Prenotazione confermata per " + dataLunga(selGiorno) + " alle " + selOra + ". Ti abbiamo inviato un'email di conferma a " + dati.email + ".", true);
+          form.querySelectorAll("input, textarea").forEach(function (el) { if (el.type === "checkbox") el.checked = false; else el.value = ""; });
+          occupati.push(selOra); selOra = null; disegnaOrari();
+        } else {
+          mostraMsg("⚠️ " + ((j && j.errore) || "Non è stato possibile completare la prenotazione."));
+          if (j && j.occupati) { occupati = j.occupati; disegnaOrari(); }
+        }
+      })
+      .catch(function () { mostraMsg("⚠️ Errore di connessione. Riprova tra qualche istante."); })
+      .then(function () { btn.disabled = false; btn.textContent = "Prenota"; });
+  });
+
+  disegnaCalendario();
+  // con un solo giorno prenotabile lo selezioniamo subito
+  if (GIORNI.length === 1 && GIORNI[0] >= iso(new Date())) scegliGiorno(GIORNI[0], false);
+})();
+</script>
+{{- end }}
