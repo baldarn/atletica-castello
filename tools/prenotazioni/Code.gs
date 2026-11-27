@@ -6,6 +6,7 @@
  * Istruzioni di installazione: tools/prenotazioni/README.md
  *
  * API (Web App):
+ *   GET  ?action=config                     -> { ok: true, giorni: [...], fasce: [["10:00","13:00"], ...], durata: 20 }
  *   GET  ?action=occupati&data=AAAA-MM-GG  -> { ok: true, occupati: ["10:00", ...] }
  *   POST body JSON (Content-Type text/plain) {action:"prenota", data, orario, nome, cognome,
  *        email, telefono, note, privacy, sito}  -> { ok: true } | { ok: false, errore, occupati? }
@@ -19,7 +20,7 @@ var CONFIG = {
   ID_FILE: '',
   TITOLO: 'Set fotografico di Natale',
   LUOGO: 'Società Atletica Castello - Oasi Biancoverde, Via Reginaldo Giuliani 518, Firenze',
-  // giorni prenotabili e fasce orarie: devono coincidere con lo shortcode nella pagina
+  // giorni prenotabili, fasce orarie e durata: la pagina web li legge da qui (?action=config)
   GIORNI: ['2026-12-19'],
   FASCE: [['10:00', '13:00'], ['14:00', '17:00']],
   DURATA_MINUTI: 20,
@@ -38,6 +39,9 @@ var INTESTAZIONI = ['Data e ora prenotazione', 'Giorno', 'Orario', 'Nome', 'Cogn
 // ---------------------------------------------------------------- web app
 function doGet(e) {
   var p = (e && e.parameter) || {};
+  if (p.action === 'config') {
+    return json_({ ok: true, giorni: CONFIG.GIORNI, fasce: CONFIG.FASCE, durata: CONFIG.DURATA_MINUTI });
+  }
   if (p.action === 'occupati') {
     if (CONFIG.GIORNI.indexOf(p.data) < 0) return json_({ ok: false, errore: 'Giorno non prenotabile.' });
     return json_({ ok: true, occupati: occupati_(p.data) });
@@ -123,8 +127,9 @@ function righe_() {
   return sh.getRange(2, 2, n, 6).getDisplayValues();
 }
 
+// slice(0, 5): un orario scritto a mano nel foglio può apparire come "10:00:00"
 function occupatiDa_(righe, giorno) {
-  return righe.filter(function (r) { return r[0] === giorno; }).map(function (r) { return r[1]; });
+  return righe.filter(function (r) { return r[0] === giorno; }).map(function (r) { return String(r[1]).slice(0, 5); });
 }
 
 function occupati_(giorno) {
@@ -186,6 +191,9 @@ function foglio_() {
     sh.appendRow(INTESTAZIONI);
     sh.setFrozenRows(1);
     sh.getRange(1, 1, 1, INTESTAZIONI.length).setFontWeight('bold');
+    // Giorno, Orario e Telefono come testo semplice: il foglio non li trasforma in date/ore/numeri
+    sh.getRange('B:C').setNumberFormat('@');
+    sh.getRange('G:G').setNumberFormat('@');
   }
   return sh;
 }

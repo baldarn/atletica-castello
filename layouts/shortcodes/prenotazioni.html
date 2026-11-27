@@ -1,22 +1,19 @@
 {{/*
   Shortcode "prenotazioni": calendario + orari cliccabili + modulo di prenotazione.
 
-  Parametri (tutti opzionali):
-    giorni  = giorni prenotabili, formato AAAA-MM-GG separati da virgola (default "2026-12-19")
-    fasce   = fasce orarie HH:MM-HH:MM separate da virgola (default "10:00-13:00,14:00-17:00")
-    durata  = durata di un turno in minuti (default 20)
+  Parametri (opzionali):
     privacy = link all'informativa privacy (default "/informativa_privacy.pdf")
+
+  Giorni, fasce orarie e durata dei turni NON si impostano qui: la pagina li legge
+  dallo script (oggetto CONFIG in tools/prenotazioni/Code.gs), così non possono divergere.
 
   L'indirizzo del backend (Google Apps Script) si imposta nel front matter della pagina:
     scriptUrl: "https://script.google.com/macros/s/.../exec"
   Se scriptUrl è vuoto la pagina mostra "Le prenotazioni apriranno a breve".
 
   Esempio:
-    {{< prenotazioni giorni="2026-12-19" fasce="10:00-13:00,14:00-17:00" durata="20" >}}
+    {{< prenotazioni >}}
 */}}
-{{- $giorni := .Get "giorni" | default "2026-12-19" -}}
-{{- $fasce := .Get "fasce" | default "10:00-13:00,14:00-17:00" -}}
-{{- $durata := .Get "durata" | default "20" -}}
 {{- $privacy := .Get "privacy" | default "/informativa_privacy.pdf" -}}
 {{- $scriptUrl := .Page.Params.scriptUrl | default "" -}}
 {{- $id := printf "prenotazioni-%d" .Ordinal -}}
@@ -80,7 +77,6 @@
 </style>
 
 <div class="prn not-prose" id="{{ $id }}"
-     data-giorni="{{ $giorni }}" data-fasce="{{ $fasce }}" data-durata="{{ $durata }}"
      data-script="{{ $scriptUrl }}">
 {{- if eq $scriptUrl "" }}
   <div class="prn-card prn-chiuso">⏳ Le prenotazioni apriranno a breve</div>
@@ -92,13 +88,13 @@
       <strong class="prn-mese"></strong>
       <button type="button" class="prn-nav" data-nav="1" aria-label="Mese successivo">›</button>
     </div>
-    <div class="prn-cal" role="grid"></div>
+    <div class="prn-cal" role="grid"><p class="prn-hint" style="grid-column:1/-1">Caricamento…</p></div>
   </div>
 
   <div class="prn-card prn-step-orari" hidden>
     <h3>2. Scegli l'orario</h3>
     <div class="prn-orari"></div>
-    <p class="prn-hint">Ogni turno dura {{ $durata }} minuti. Gli orari barrati sono già prenotati o già passati. È possibile una sola prenotazione per persona.</p>
+    <p class="prn-hint">Ogni turno dura <span class="prn-durata"></span> minuti. Gli orari barrati sono già prenotati o già passati. È possibile una sola prenotazione per persona.</p>
   </div>
 
   <div class="prn-card prn-step-form" hidden>
@@ -117,6 +113,8 @@
       <div class="prn-full"><button type="submit" class="prn-submit">Prenota</button></div>
     </form>
   </div>
+
+  <div class="prn-card prn-esito prn-msg prn-okmsg" hidden role="status" aria-live="polite"></div>
 {{- end }}
 </div>
 
@@ -126,11 +124,8 @@
   var root = document.getElementById({{ $id }});
   if (!root) return;
   var SCRIPT = root.dataset.script;
-  var GIORNI = root.dataset.giorni.split(",").map(function (s) { return s.trim(); }).filter(Boolean).sort();
-  var DURATA = parseInt(root.dataset.durata, 10) || 20;
-  var FASCE = root.dataset.fasce.split(",").map(function (f) {
-    var p = f.trim().split("-"); return { da: p[0].trim(), a: p[1].trim() };
-  });
+  // giorni, fasce e durata arrivano dallo script (?action=config)
+  var GIORNI = [], FASCE = [], DURATA = 20;
   var MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
   var GSET = ["lun","mar","mer","gio","ven","sab","dom"];
   var GLUNGHI = ["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
@@ -151,10 +146,10 @@
   var $ = function (sel) { return root.querySelector(sel); };
   var cal = $(".prn-cal"), meseEl = $(".prn-mese"), orari = $(".prn-orari");
   var stepOrari = $(".prn-step-orari"), stepForm = $(".prn-step-form");
-  var form = $(".prn-form"), msg = $(".prn-msg"), btn = $(".prn-submit"), riep = $(".prn-riepilogo");
+  var form = $(".prn-form"), msg = form.querySelector(".prn-msg"), btn = $(".prn-submit"), riep = $(".prn-riepilogo");
+  var esito = $(".prn-esito");
 
-  var primo = parseISO(GIORNI[0]), ultimo = parseISO(GIORNI[GIORNI.length - 1]);
-  var vista = new Date(primo.getFullYear(), primo.getMonth(), 1);
+  var primo, ultimo, vista;
   var selGiorno = null, selOra = null, occupati = [];
 
   function mostraMsg(testo, ok) {
@@ -200,9 +195,17 @@
     orari.innerHTML = '<p class="prn-hint">Caricamento orari disponibili…</p>';
     return fetch(SCRIPT + "?action=occupati&data=" + encodeURIComponent(selGiorno))
       .then(function (r) { return r.json(); })
-      .then(function (j) { occupati = (j && j.occupati) || []; })
-      .catch(function () { occupati = []; })
-      .then(disegnaOrari);
+      .then(function (j) {
+        if (!j || !j.ok || !Array.isArray(j.occupati)) throw new Error("risposta non valida");
+        occupati = j.occupati; disegnaOrari();
+      })
+      .catch(function () { mostraErrore(orari, "Impossibile caricare gli orari disponibili, riprova.", "orari"); });
+  }
+
+  // messaggio d'errore con pulsante "Riprova" (data-riprova = cosa ricaricare)
+  function mostraErrore(box, testo, cosa) {
+    box.innerHTML = '<div class="prn-msg prn-err" style="grid-column:1/-1">⚠️ ' + testo +
+      ' <button type="button" class="prn-nav" data-riprova="' + cosa + '">Riprova</button></div>';
   }
 
   function scegliGiorno(g, scorri) {
@@ -214,7 +217,11 @@
   root.addEventListener("click", function (e) {
     var t = e.target.closest("button");
     if (!t || !root.contains(t)) return;
-    if (t.dataset.nav) {
+    if (t.dataset.riprova === "orari") {
+      caricaOccupati();
+    } else if (t.dataset.riprova === "config") {
+      caricaConfig();
+    } else if (t.dataset.nav) {
       vista = new Date(vista.getFullYear(), vista.getMonth() + parseInt(t.dataset.nav, 10), 1);
       disegnaCalendario();
     } else if (t.dataset.giorno) {
@@ -222,7 +229,7 @@
     } else if (t.dataset.ora) {
       selOra = t.dataset.ora; disegnaOrari();
       riep.textContent = "📅 " + dataLunga(selGiorno) + " alle ore " + selOra;
-      stepForm.hidden = false; msg.hidden = true;
+      stepForm.hidden = false; msg.hidden = true; esito.hidden = true;
       stepForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   });
@@ -248,9 +255,11 @@
       .then(function (r) { return r.json(); })
       .then(function (j) {
         if (j && j.ok) {
-          mostraMsg("✅ Prenotazione confermata per " + dataLunga(selGiorno) + " alle " + selOra + ". Ti abbiamo inviato un'email di conferma a " + dati.email + ".", true);
+          esito.textContent = "✅ Prenotazione confermata per " + dataLunga(selGiorno) + " alle " + selOra + ". Ti abbiamo inviato un'email di conferma a " + dati.email + ".";
           form.querySelectorAll("input, textarea").forEach(function (el) { if (el.type === "checkbox") el.checked = false; else el.value = ""; });
-          occupati.push(selOra); selOra = null; disegnaOrari();
+          occupati.push(selOra); selOra = null; riep.textContent = ""; msg.hidden = true;
+          stepForm.hidden = true; esito.hidden = false; disegnaOrari();
+          esito.scrollIntoView({ behavior: "smooth", block: "nearest" });
         } else {
           mostraMsg("⚠️ " + ((j && j.errore) || "Non è stato possibile completare la prenotazione."));
           if (j && j.occupati) { occupati = j.occupati; disegnaOrari(); }
@@ -260,9 +269,29 @@
       .then(function () { btn.disabled = false; btn.textContent = "Prenota"; });
   });
 
-  disegnaCalendario();
-  // con un solo giorno prenotabile lo selezioniamo subito
-  if (GIORNI.length === 1 && GIORNI[0] >= iso(new Date())) scegliGiorno(GIORNI[0], false);
+  function caricaConfig() {
+    cal.innerHTML = '<p class="prn-hint" style="grid-column:1/-1">Caricamento…</p>';
+    fetch(SCRIPT + "?action=config")
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !Array.isArray(j.giorni) || !j.giorni.length || !Array.isArray(j.fasce)) throw new Error("config non valida");
+        GIORNI = j.giorni.slice().sort();
+        FASCE = j.fasce.map(function (f) { return { da: f[0], a: f[1] }; });
+        DURATA = parseInt(j.durata, 10) || 20;
+        $(".prn-durata").textContent = DURATA;
+        primo = parseISO(GIORNI[0]); ultimo = parseISO(GIORNI[GIORNI.length - 1]);
+        vista = new Date(primo.getFullYear(), primo.getMonth(), 1);
+        disegnaCalendario();
+        // con un solo giorno prenotabile lo selezioniamo subito
+        if (GIORNI.length === 1 && GIORNI[0] >= iso(new Date())) scegliGiorno(GIORNI[0], false);
+      })
+      .catch(function () {
+        root.querySelector('[data-nav="-1"]').disabled = true; root.querySelector('[data-nav="1"]').disabled = true;
+        mostraErrore(cal, "Impossibile caricare il calendario delle prenotazioni, riprova.", "config");
+      });
+  }
+
+  caricaConfig();
 })();
 </script>
 {{- end }}

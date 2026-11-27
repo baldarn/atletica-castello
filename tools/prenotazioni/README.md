@@ -12,7 +12,7 @@ Finché `scriptUrl` nel front matter della pagina è vuoto, il sito mostra
 1. Apri su Google Drive il file **natale2026_setfoto** (crealo se non esiste: un Foglio Google vuoto).
 2. Menu **Estensioni → Apps Script**.
 3. Cancella il contenuto di `Codice.gs`, incolla tutto il contenuto di [`Code.gs`](Code.gs) e salva (💾).
-   Controlla l'oggetto `CONFIG` in cima (giorni, orari, email di risposta, eventuale `NOTIFICA_A`
+   Controlla l'oggetto `CONFIG` in cima (giorni, orari e durata dei turni, email di risposta, eventuale `NOTIFICA_A`
    per ricevere una copia di ogni prenotazione).
 4. Nella barra in alto scegli la funzione **`installa`** e premi **Esegui**.
    Google chiede le autorizzazioni (accesso al foglio e invio email a tuo nome): accettale
@@ -31,13 +31,15 @@ Finché `scriptUrl` nel front matter della pagina è vuoto, il sito mostra
 
 7. Pubblica il sito (`make deploy`).
 
-Per verificare: aprendo `URL/exec?action=occupati&data=2026-12-19` nel browser deve comparire
+Per verificare: aprendo `URL/exec?action=config` deve comparire la configurazione dei giorni e degli orari;
+aprendo `URL/exec?action=occupati&data=2026-12-19` nel browser deve comparire
 `{"ok":true,"occupati":[]}`.
 
 ## Come funziona
 
-- **Orari**: turni da 20 minuti, 10:00–13:00 e 14:00–17:00 (18 turni). Il backend accetta solo
-  giorni e orari presenti in `CONFIG`: se li cambi, aggiorna anche i parametri dello shortcode nella pagina.
+- **Orari**: turni da 20 minuti, 10:00–13:00 e 14:00–17:00 (18 turni). Giorni, fasce e durata si
+  cambiano **solo** in `CONFIG` dentro `Code.gs`: la pagina li legge dallo script (`?action=config`),
+  quindi sito e script non possono divergere. Il backend accetta solo giorni e orari previsti lì.
 - **Doppie prenotazioni**: ogni turno può essere prenotato una sola volta. Il controllo avviene
   con un lock, quindi anche due invii contemporanei non possono prendere lo stesso orario;
   chi arriva secondo vede un messaggio e la lista aggiornata degli orari liberi.

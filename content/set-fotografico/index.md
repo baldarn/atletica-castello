@@ -39,4 +39,4 @@ Società Atletica Castello – Oasi Biancoverde, Via Reginaldo Giuliani 518, Fir
 
 ## Prenota il tuo turno
 
-{{< prenotazioni giorni="2026-12-19" fasce="10:00-13:00,14:00-17:00" durata="20" >}}
+{{< prenotazioni >}}
